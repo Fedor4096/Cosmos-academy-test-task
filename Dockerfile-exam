@@ -1,0 +1,49 @@
+FROM --platform=linux mikefarah/yq:4.30.8 AS YQ
+FROM --platform=linux golang:1.19.5-bullseye
+
+# Change your versions here
+ENV IGNITE_VERSION=0.22.1
+ENV MOCKGEN_VERSION=1.6.0
+ENV NODE_VERSION=18.x
+
+ENV LOCAL=/usr/local
+
+ENV PACKAGES bc curl gcc jq make netcat unzip
+RUN apt-get update
+RUN apt-get install -y $PACKAGES
+
+# Install Ignite
+RUN curl -L https://get.ignite.com/cli@v${IGNITE_VERSION}! | bash
+
+# Install Mockgen
+RUN go install github.com/golang/mock/mockgen@v${MOCKGEN_VERSION}
+
+# Install Node
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION} | bash -
+RUN apt-get install -y nodejs
+
+# Install yq
+COPY --from=YQ /usr/bin/yq $LOCAL/bin/yq
+
+WORKDIR /original
+ADD . /original
+RUN go mod download
+RUN go build -o /tmp ./cmd/toll-roadd/main.go
+
+WORKDIR /original/client
+RUN rm -rf /original/client/node_modules
+RUN npm install
+
+WORKDIR /exam
+
+# Create the image
+# $ docker build -f Dockerfile-exam . -t exam_i
+# To test only 1 command
+# $ docker run --rm -it -v $(pwd):/exam exam_i go test github.com/b9lab/toll-road/x/tollroad/uservaultstudent
+# To build container
+# $ docker create --name exam -i -v $(pwd):/exam exam_i
+# $ docker start exam
+# In other shell, to test 1 command
+# $ docker exec -it exam go test github.com/b9lab/toll-road/x/tollroad/uservaultstudent
+# To test it all
+# $ docker run --rm -it -v $(pwd):/exam exam_i /original/score-ci.sh
