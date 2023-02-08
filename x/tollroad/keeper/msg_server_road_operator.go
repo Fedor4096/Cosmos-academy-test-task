@@ -10,11 +10,13 @@ import (
 
 func (k msgServer) CreateRoadOperator(goCtx context.Context, msg *types.MsgCreateRoadOperator) (*types.MsgCreateRoadOperatorResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	nextId, _ := k.GetSystemInfo(ctx)
 
 	// Check if the value already exists
 	_, isFound := k.GetRoadOperator(
 		ctx,
-		"0",
+		//"0",
+		string(nextId.GetNextOperatorId()),
 	)
 	if isFound {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "index already set")
@@ -22,16 +24,27 @@ func (k msgServer) CreateRoadOperator(goCtx context.Context, msg *types.MsgCreat
 
 	var roadOperator = types.RoadOperator{
 		Creator: msg.Creator,
-		Index:   "0",
-		Name:    msg.Name,
-		Token:   msg.Token,
-		Active:  msg.Active,
+		//Index:   "0",
+		Index:  string(nextId.GetNextOperatorId()),
+		Name:   msg.Name,
+		Token:  msg.Token,
+		Active: msg.Active,
 	}
 
 	k.SetRoadOperator(
 		ctx,
 		roadOperator,
 	)
+
+	var systemInfo = types.SystemInfo{
+		NextOperatorId: (nextId.GetNextOperatorId() + 1),
+	}
+
+	k.SetSystemInfo(
+		ctx,
+		systemInfo,
+	)
+
 	return &types.MsgCreateRoadOperatorResponse{}, nil
 }
 
