@@ -2,33 +2,40 @@ package keeper
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/b9lab/toll-road/x/tollroad/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"strconv"
 )
 
 func (k msgServer) CreateRoadOperator(goCtx context.Context, msg *types.MsgCreateRoadOperator) (*types.MsgCreateRoadOperatorResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	nextId, _ := k.GetSystemInfo(ctx)
-
+	currentSystemInfoState, found := k.GetSystemInfo(ctx)
+	if found == false {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "SystemInfo not found")
+	}
+	nextId := strconv.FormatUint(currentSystemInfoState.GetNextOperatorId(), 10)
+	fmt.Println(nextId)
 	// Check if the value already exists
 	_, isFound := k.GetRoadOperator(
 		ctx,
-		//"0",
-		string(nextId.GetNextOperatorId()),
+		string(nextId),
 	)
-	if isFound {
+	if isFound == true {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "index already set")
+	}
+
+	if msg.Creator != "" && msg.Name != "" && msg.Token != "" && msg.Active != false {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "wrong values")
 	}
 
 	var roadOperator = types.RoadOperator{
 		Creator: msg.Creator,
-		//Index:   "0",
-		Index:  string(nextId.GetNextOperatorId()),
-		Name:   msg.Name,
-		Token:  msg.Token,
-		Active: msg.Active,
+		Index:   string(nextId),
+		Name:    msg.Name,
+		Token:   msg.Token,
+		Active:  msg.Active,
 	}
 
 	k.SetRoadOperator(
@@ -36,16 +43,18 @@ func (k msgServer) CreateRoadOperator(goCtx context.Context, msg *types.MsgCreat
 		roadOperator,
 	)
 
-	var systemInfo = types.SystemInfo{
-		NextOperatorId: (nextId.GetNextOperatorId() + 1),
-	}
+	//nextIdi, _ := strconv.Atoi(nextId)
+	//var systemInfo = types.SystemInfo{
+	//	NextOperatorId: (uint64(nextIdi) + 1),
+	//}
+	currentSystemInfoState.NextOperatorId++
+	k.Keeper.SetSystemInfo(ctx, currentSystemInfoState)
+	//k.SetSystemInfo(
+	//	ctx,
+	//	systemInfo,
+	//)
 
-	k.SetSystemInfo(
-		ctx,
-		systemInfo,
-	)
-
-	return &types.MsgCreateRoadOperatorResponse{}, nil
+	return &types.MsgCreateRoadOperatorResponse{Index: nextId}, nil
 }
 
 func (k msgServer) UpdateRoadOperator(goCtx context.Context, msg *types.MsgUpdateRoadOperator) (*types.MsgUpdateRoadOperatorResponse, error) {
