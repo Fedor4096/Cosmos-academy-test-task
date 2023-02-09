@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	"github.com/b9lab/toll-road/x/tollroad/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -11,14 +10,17 @@ import (
 
 func (k msgServer) CreateRoadOperator(goCtx context.Context, msg *types.MsgCreateRoadOperator) (*types.MsgCreateRoadOperatorResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	currentSystemInfoState, found := k.GetSystemInfo(ctx)
+
+	currentSystemInfoState, found := k.Keeper.GetSystemInfo(ctx)
+
 	if found == false {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "SystemInfo not found")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrNotFound, "SystemInfo not found")
 	}
+
 	nextId := strconv.FormatUint(currentSystemInfoState.GetNextOperatorId(), 10)
-	fmt.Println(nextId)
+
 	// Check if the value already exists
-	_, isFound := k.GetRoadOperator(
+	_, isFound := k.Keeper.GetRoadOperator(
 		ctx,
 		string(nextId),
 	)
@@ -26,9 +28,9 @@ func (k msgServer) CreateRoadOperator(goCtx context.Context, msg *types.MsgCreat
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "index already set")
 	}
 
-	if msg.Creator != "" && msg.Name != "" && msg.Token != "" && msg.Active != false {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "wrong values")
-	}
+	//if msg.Creator != "" && msg.Name != "" && msg.Token != "" && msg.Active != false {
+	//	return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "wrong values")
+	//}
 
 	var roadOperator = types.RoadOperator{
 		Creator: msg.Creator,
@@ -38,21 +40,28 @@ func (k msgServer) CreateRoadOperator(goCtx context.Context, msg *types.MsgCreat
 		Active:  msg.Active,
 	}
 
-	k.SetRoadOperator(
+	//err := roadOperator.Validate()
+	//if err != nil {
+	//	return nil, err
+	//}
+
+	k.Keeper.SetRoadOperator(
 		ctx,
 		roadOperator,
 	)
 
-	//nextIdi, _ := strconv.Atoi(nextId)
-	//var systemInfo = types.SystemInfo{
-	//	NextOperatorId: (uint64(nextIdi) + 1),
-	//}
 	currentSystemInfoState.NextOperatorId++
 	k.Keeper.SetSystemInfo(ctx, currentSystemInfoState)
-	//k.SetSystemInfo(
-	//	ctx,
-	//	systemInfo,
-	//)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(types.CreateRoadOperatorEventType,
+			sdk.NewAttribute(types.CreateRoadOperatorEventCreator, msg.Creator),
+			sdk.NewAttribute(types.CreateRoadOperatorEventnextId, string(nextId)),
+			sdk.NewAttribute(types.CreateRoadOperatorEventName, msg.Name),
+			sdk.NewAttribute(types.CreateRoadOperatorEventToken, msg.Token),
+			sdk.NewAttribute(types.CreateRoadOperatorEventActive, strconv.FormatBool(msg.Active)),
+		),
+	)
 
 	return &types.MsgCreateRoadOperatorResponse{Index: nextId}, nil
 }
