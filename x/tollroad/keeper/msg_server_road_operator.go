@@ -54,12 +54,17 @@ func (k msgServer) CreateRoadOperator(goCtx context.Context, msg *types.MsgCreat
 	k.Keeper.SetSystemInfo(ctx, currentSystemInfoState)
 
 	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(types.CreateRoadOperatorEventType,
-			sdk.NewAttribute(types.CreateRoadOperatorEventCreator, msg.Creator),
-			sdk.NewAttribute(types.CreateRoadOperatorEventnextId, string(nextId)),
-			sdk.NewAttribute(types.CreateRoadOperatorEventName, msg.Name),
-			sdk.NewAttribute(types.CreateRoadOperatorEventToken, msg.Token),
-			sdk.NewAttribute(types.CreateRoadOperatorEventActive, strconv.FormatBool(msg.Active)),
+		sdk.NewEvent("new-road-operator-created",
+			////sdk.NewAttribute(types.CreateRoadOperatorEventCreator, msg.Creator),
+			//sdk.NewAttribute(types.CreateRoadOperatorEventnextId, string(nextId)),
+			//sdk.NewAttribute(types.CreateRoadOperatorEventName, msg.Name),
+			//sdk.NewAttribute(types.CreateRoadOperatorEventToken, msg.Token),
+			//sdk.NewAttribute(types.CreateRoadOperatorEventActive, strconv.FormatBool(msg.Active)),
+			sdk.NewAttribute("creator", msg.Creator),
+			sdk.NewAttribute("road-operator-index", string(nextId)),
+			sdk.NewAttribute("name", msg.Name),
+			sdk.NewAttribute("token", msg.Token),
+			sdk.NewAttribute("active", strconv.FormatBool(msg.Active)),
 		),
 	)
 
