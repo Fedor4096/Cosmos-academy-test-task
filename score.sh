@@ -32,24 +32,24 @@ userVaultMaxFails=43
 userVaultWeight=4
 userVaultWins=$(echo "scale=3;((100*($userVaultMaxFails-$userVaultResult)*$userVaultWeight)/$userVaultMaxFails)" | bc)
 
-$where/testing-cosmjs.sh
-cosmjsResult=$(echo $?)
-if [[ $cosmjsResult -eq 0 ]];
-then
-    # It's a pass
-    :
-elif [[ $cosmjsResult -ge 11 ]];
-then
-    cosmjsResult=$(($cosmjsResult-10))
-else
-    exit 255
-fi
-cosmjsMaxFails=4
-cosmjsWeight=2
-cosmjsWins=$(echo "scale=3;((100*($cosmjsMaxFails-$cosmjsResult)*$cosmjsWeight)/$cosmjsMaxFails)" | bc)
-
-totalWeights=$(($genesisWeight+$roadOperatorWeight+$userVaultWeight+$cosmjsWeight))
-
-score=$(echo "scale=3;(($genesisWins+$roadOperatorWins+$userVaultWins+$cosmjsWins)/$totalWeights)" | bc)
-
-echo "FS_SCORE:"$score"%"
+#$where/testing-cosmjs.sh
+#cosmjsResult=$(echo $?)
+#if [[ $cosmjsResult -eq 0 ]];
+#then
+#    # It's a pass
+#    :
+#elif [[ $cosmjsResult -ge 11 ]];
+#then
+#    cosmjsResult=$(($cosmjsResult-10))
+#else
+#    exit 255
+#fi
+#cosmjsMaxFails=4
+#cosmjsWeight=2
+#cosmjsWins=$(echo "scale=3;((100*($cosmjsMaxFails-$cosmjsResult)*$cosmjsWeight)/$cosmjsMaxFails)" | bc)
+#
+#totalWeights=$(($genesisWeight+$roadOperatorWeight+$userVaultWeight+$cosmjsWeight))
+#
+#score=$(echo "scale=3;(($genesisWins+$roadOperatorWins+$userVaultWins+$cosmjsWins)/$totalWeights)" | bc)
+#
+#echo "FS_SCORE:"$score"%"

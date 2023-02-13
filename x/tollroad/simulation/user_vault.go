@@ -27,13 +27,14 @@ func SimulateMsgCreateUserVault(
 
 		i := r.Int()
 		msg := &types.MsgCreateUserVault{
-			Creator:           simAccount.Address.String(),
-			Owner:             strconv.Itoa(i),
+			Creator: simAccount.Address.String(),
+			//Owner:             strconv.Itoa(i),
 			RoadOperatorIndex: strconv.Itoa(i),
 			Token:             strconv.Itoa(i),
 		}
 
-		_, found := k.GetUserVault(ctx, msg.Owner, msg.RoadOperatorIndex, msg.Token)
+		//_, found := k.GetUserVault(ctx, msg.Owner, msg.RoadOperatorIndex, msg.Token)
+		_, found := k.GetUserVault(ctx, simAccount.Address.String(), msg.RoadOperatorIndex, msg.Token)
 		if found {
 			return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "UserVault already exist"), nil, nil
 		}
@@ -71,7 +72,7 @@ func SimulateMsgUpdateUserVault(
 			found        = false
 		)
 		for _, obj := range allUserVault {
-			simAccount, found = FindAccount(accs, obj.Creator)
+			simAccount, found = FindAccount(accs, obj.Owner)
 			if found {
 				userVault = obj
 				break
@@ -82,7 +83,7 @@ func SimulateMsgUpdateUserVault(
 		}
 		msg.Creator = simAccount.Address.String()
 
-		msg.Owner = userVault.Owner
+		//msg.Owner = userVault.Owner
 		msg.RoadOperatorIndex = userVault.RoadOperatorIndex
 		msg.Token = userVault.Token
 
@@ -119,7 +120,7 @@ func SimulateMsgDeleteUserVault(
 			found        = false
 		)
 		for _, obj := range allUserVault {
-			simAccount, found = FindAccount(accs, obj.Creator)
+			simAccount, found = FindAccount(accs, obj.Owner)
 			if found {
 				userVault = obj
 				break
@@ -130,7 +131,7 @@ func SimulateMsgDeleteUserVault(
 		}
 		msg.Creator = simAccount.Address.String()
 
-		msg.Owner = userVault.Owner
+		//msg.Owner = userVault.Owner
 		msg.RoadOperatorIndex = userVault.RoadOperatorIndex
 		msg.Token = userVault.Token
 

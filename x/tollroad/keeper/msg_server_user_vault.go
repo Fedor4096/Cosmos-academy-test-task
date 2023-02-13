@@ -23,7 +23,7 @@ func (k msgServer) CreateUserVault(goCtx context.Context, msg *types.MsgCreateUs
 	}
 
 	var userVault = types.UserVault{
-		Creator:           msg.Creator,
+		//Creator: msg.Owner,
 		Owner:             msg.Owner,
 		RoadOperatorIndex: msg.RoadOperatorIndex,
 		Token:             msg.Token,
@@ -43,7 +43,7 @@ func (k msgServer) UpdateUserVault(goCtx context.Context, msg *types.MsgUpdateUs
 	// Check if the value exists
 	valFound, isFound := k.GetUserVault(
 		ctx,
-		msg.Owner,
+		msg.Creator,
 		msg.RoadOperatorIndex,
 		msg.Token,
 	)
@@ -52,13 +52,13 @@ func (k msgServer) UpdateUserVault(goCtx context.Context, msg *types.MsgUpdateUs
 	}
 
 	// Checks if the the msg creator is the same as the current owner
-	if msg.Creator != valFound.Creator {
+	if msg.Creator != valFound.Owner {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
 	var userVault = types.UserVault{
-		Creator:           msg.Creator,
-		Owner:             msg.Owner,
+		//Creator:           msg.Creator,
+		Owner:             msg.Creator,
 		RoadOperatorIndex: msg.RoadOperatorIndex,
 		Token:             msg.Token,
 		Balance:           msg.Balance,
@@ -75,7 +75,7 @@ func (k msgServer) DeleteUserVault(goCtx context.Context, msg *types.MsgDeleteUs
 	// Check if the value exists
 	valFound, isFound := k.GetUserVault(
 		ctx,
-		msg.Owner,
+		msg.Creator,
 		msg.RoadOperatorIndex,
 		msg.Token,
 	)
@@ -84,13 +84,13 @@ func (k msgServer) DeleteUserVault(goCtx context.Context, msg *types.MsgDeleteUs
 	}
 
 	// Checks if the the msg creator is the same as the current owner
-	if msg.Creator != valFound.Creator {
+	if msg.Creator != valFound.Owner {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
 	k.RemoveUserVault(
 		ctx,
-		msg.Owner,
+		msg.Creator,
 		msg.RoadOperatorIndex,
 		msg.Token,
 	)
