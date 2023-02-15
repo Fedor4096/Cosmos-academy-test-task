@@ -33,6 +33,11 @@ func (k msgServer) CreateUserVault(goCtx context.Context, msg *types.MsgCreateUs
 		Balance:           msg.Balance,
 	}
 
+	err := k.Keeper.CreateVault(ctx, &userVault)
+	if err != nil {
+		return nil, err
+	}
+
 	k.SetUserVault(
 		ctx,
 		userVault,
@@ -62,12 +67,43 @@ func (k msgServer) UpdateUserVault(goCtx context.Context, msg *types.MsgUpdateUs
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
+	balance := msg.Balance
+	userToModuleFlag := true
+	if msg.Balance > valFound.Balance {
+		balance = msg.Balance - valFound.Balance
+		userToModuleFlag = true
+	} else if msg.Balance < valFound.Balance {
+		balance = valFound.Balance - msg.Balance
+		userToModuleFlag = false
+	}
+
 	var userVault = types.UserVault{
 		//Creator:           msg.Creator,
 		Owner:             msg.Creator,
 		RoadOperatorIndex: msg.RoadOperatorIndex,
 		Token:             msg.Token,
+		//Balance:           msg.Balance,
+		Balance: balance,
+	}
+
+	if userToModuleFlag == true {
+		err := k.Keeper.UpdateVaultUserToModule(ctx, &userVault)
+		if err != nil {
+			return nil, err
+		}
+	} else if userToModuleFlag == false {
+		err := k.Keeper.UpdateVaultModuleToUser(ctx, &userVault)
+		if err != nil {
+			return nil, err
+		}
+	}
+	userVault = types.UserVault{
+		//Creator:           msg.Creator,
+		Owner:             msg.Creator,
+		RoadOperatorIndex: msg.RoadOperatorIndex,
+		Token:             msg.Token,
 		Balance:           msg.Balance,
+		//Balance: balance,
 	}
 
 	k.SetUserVault(ctx, userVault)
@@ -92,6 +128,11 @@ func (k msgServer) DeleteUserVault(goCtx context.Context, msg *types.MsgDeleteUs
 	// Checks if the the msg creator is the same as the current owner
 	if msg.Creator != valFound.Owner {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
+	}
+
+	err := k.Keeper.DeleteVault(ctx, &valFound)
+	if err != nil {
+		return nil, err
 	}
 
 	k.RemoveUserVault(
