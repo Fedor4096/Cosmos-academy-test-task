@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"github.com/b9lab/toll-road/x/tollroad/types"
+	types "github.com/b9lab/toll-road/x/tollroad/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -14,17 +14,20 @@ func (k msgServer) CreateUserVault(goCtx context.Context, msg *types.MsgCreateUs
 	// Check if the value already exists
 	_, isFound := k.GetUserVault(
 		ctx,
-		msg.Owner,
+		msg.Creator,
 		msg.RoadOperatorIndex,
 		msg.Token,
 	)
 	if isFound {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "index already set")
+		return nil, sdkerrors.Wrap(types.ErrIndexSet, "index already set")
+	}
+	if msg.Balance == 0 {
+		return nil, sdkerrors.Wrap(types.ErrZeroTokens, "index already set")
 	}
 
 	var userVault = types.UserVault{
-		//Creator: msg.Owner,
-		Owner:             msg.Owner,
+		//Creator:           msg.Creator,
+		Owner:             msg.Creator,
 		RoadOperatorIndex: msg.RoadOperatorIndex,
 		Token:             msg.Token,
 		Balance:           msg.Balance,
@@ -40,7 +43,10 @@ func (k msgServer) CreateUserVault(goCtx context.Context, msg *types.MsgCreateUs
 func (k msgServer) UpdateUserVault(goCtx context.Context, msg *types.MsgUpdateUserVault) (*types.MsgUpdateUserVaultResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Check if the value exists
+	if msg.Balance == 0 {
+		return nil, sdkerrors.Wrap(types.ErrZeroTokens, "index already set")
+	}
+	//Check if the value exists
 	valFound, isFound := k.GetUserVault(
 		ctx,
 		msg.Creator,
