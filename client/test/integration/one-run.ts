@@ -46,14 +46,14 @@ before("create signing clients", async function () {
         RPC_URL,
         aliceSigner,
         {
-            gasPrice: GasPrice.fromString("0stake"),
+            //gasPrice: GasPrice.fromString("0stake"),
         },
     )
     bobClient = await TollroadSigningStargateClient.connectWithSigner(
         RPC_URL,
         bobSigner,
         {
-            gasPrice: GasPrice.fromString("0stake"),
+            //gasPrice: GasPrice.fromString("0stake"),
         },
     )
     tollroad = aliceClient.tollroadQueryClient!.tollroad
@@ -104,7 +104,7 @@ it("can create road operator", async function () {
     )
     const roadOperator: RoadOperator = (await tollroad.getRoadOperator(
         roadOperatorId,
-    ))!
+    ))
     expect(roadOperator).to.include({
         index: roadOperatorId,
         name: "EzyTraffic",

@@ -57,9 +57,23 @@ fi
 # Mocha tests
 
 cd $currentPath/client
-npm test
+testResult=$(npm test 2>&1)
 totalFails=$(echo $?)
 
+echo "$testResult"
+compileOk=$(echo "$testResult" | grep -c "Unable to compile TypeScript")
+extensionOk=$(echo "$testResult" | grep -c ERR_UNKNOWN_FILE_EXTENSION)
+beforeOk=$(echo "$testResult" | grep -c "before all")
+if [ $compileOk -gt 0 ]
+then
+    totalFails=4
+elif [ $extensionOk -gt 0 ]
+then
+    totalFails=4
+elif [ $beforeOk -gt 0 ]
+then
+    totalFails=4
+fi
 echo totalFails $totalFails
 
 echo killing $ignitePid
@@ -71,7 +85,7 @@ then
 fi
 
 # To get the number of failures, do:
-# $ echo $? 
+# $ echo $?
 # if it is 0 -> no errors
 # if it is 11 or more -> subtract 10 and you have the number of errors.
 # any other number and there was a problem with testing proper.
