@@ -5,7 +5,7 @@ import (
 
 	"github.com/b9lab/toll-road/testutil/mock_types"
 	"github.com/b9lab/toll-road/x/tollroad/keeper"
-	"github.com/b9lab/toll-road/x/tollroad/types"
+	types "github.com/b9lab/toll-road/x/tollroad/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -22,7 +22,7 @@ func TollroadKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	return TollroadKeeperWithMocks(t, nil)
 }
 
-func TollroadKeeperWithMocks(t testing.TB, _ *mock_types.MockBankEscrowKeeper) (*keeper.Keeper, sdk.Context) {
+func TollroadKeeperWithMocks(t testing.TB, bank *mock_types.MockBankEscrowKeeper) (*keeper.Keeper, sdk.Context) {
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
@@ -42,6 +42,7 @@ func TollroadKeeperWithMocks(t testing.TB, _ *mock_types.MockBankEscrowKeeper) (
 		"TollroadParams",
 	)
 	k := keeper.NewKeeper(
+		bank,
 		cdc,
 		storeKey,
 		memStoreKey,

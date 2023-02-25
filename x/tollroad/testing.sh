@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-
+#go test ./x/tollroad/uservaultstudent/msg_server_user_vault_test.go -v
+#go test ./x/tollroad/uservaultstudent/tx_user_vault_test.go -v
 where=$1
 if [[ $where = "" ]];
 then
     where="."
 fi
-
+echo $pwd
 output=$(cd $where && go test github.com/b9lab/toll-road/x/tollroad -v)
 
 # Set this to true when testing the validity of your tests.

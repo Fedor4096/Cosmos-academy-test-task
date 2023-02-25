@@ -64,6 +64,7 @@ func TestCreateUserVault(t *testing.T) {
 			}
 			args = append(args, fields...)
 			args = append(args, tc.args...)
+			//t.Log(args)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdCreateUserVault(), args)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
@@ -72,6 +73,8 @@ func TestCreateUserVault(t *testing.T) {
 				var resp sdk.TxResponse
 				require.NoError(t, ctx.Codec.UnmarshalJSON(out.Bytes(), &resp))
 				require.Equal(t, tc.code, resp.Code)
+				//t.Log(out.String())
+				//t.Log(&resp.Code)
 
 				if tc.code == 0 {
 					out, err = clitestutil.ExecTestCLICmd(ctx, sdkcli.GetBalancesCmd(), moduleBalanceQueryArgs)
@@ -110,7 +113,7 @@ func TestUpdateUserVault(t *testing.T) {
 		fmt.Sprintf("--%s=%s", sdkcli.FlagDenom, net.Config.BondDenom),
 		fmt.Sprintf("--%s=json", tmcli.OutputFlag),
 	}
-
+	//t.Log(clitestutil.ExecTestCLICmd(ctx, sdkcli.GetBalancesCmd(), moduleBalanceQueryArgs)[0])
 	for _, tc := range []struct {
 		desc                string
 		idRoadOperatorIndex string
@@ -162,7 +165,9 @@ func TestUpdateUserVault(t *testing.T) {
 			}
 			args = append(args, tc.fields...)
 			args = append(args, tc.args...)
+			t.Log(args)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdUpdateUserVault(), args)
+			//out, err = clitestutil.ExecTestCLICmd(ctx, cli.CmdUpdateUserVault(), args)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
 			} else {
@@ -173,6 +178,8 @@ func TestUpdateUserVault(t *testing.T) {
 
 				if tc.code == 0 {
 					out, err = clitestutil.ExecTestCLICmd(ctx, sdkcli.GetBalancesCmd(), moduleBalanceQueryArgs)
+					//out, err = clitestutil.ExecTestCLICmd(ctx, sdkcli.GetBalancesCmd(), moduleBalanceQueryArgs)
+					//out, err = clitestutil.ExecTestCLICmd(ctx, sdkcli.GetBalancesCmd(), moduleBalanceQueryArgs)
 					require.NoError(t, err)
 					require.Equal(t,
 						fmt.Sprintf("{\"denom\":\"stake\",\"amount\":\"%s\"}\n", tc.fields[0]),

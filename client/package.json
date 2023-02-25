@@ -9,8 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@cosmjs/stargate": "0.28.13",
-    "protobufjs": "7.1.2"
+    "@cosmjs/stargate": "0.28.11",
+    "protobufjs": "7.0.0"
   },
   "devDependencies": {
     "@types/chai": "4.3.3",

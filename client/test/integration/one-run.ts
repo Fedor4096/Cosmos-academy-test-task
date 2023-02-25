@@ -104,7 +104,7 @@ it("can create road operator", async function () {
     )
     const roadOperator: RoadOperator = (await tollroad.getRoadOperator(
         roadOperatorId,
-    ))!
+    ))
     expect(roadOperator).to.include({
         index: roadOperatorId,
         name: "EzyTraffic",

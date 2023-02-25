@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"github.com/b9lab/toll-road/x/tollroad/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -11,17 +12,17 @@ import (
 
 func CmdCreateUserVault() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-user-vault [owner] [road-operator-index] [token] [balance]",
+		Use:   "create-user-vault [road-operator-index] [token] [balance]",
 		Short: "Create a new UserVault",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			// Get indexes
-			indexOwner := args[0]
-			indexRoadOperatorIndex := args[1]
-			indexToken := args[2]
+			//indexOwner := args[0]
+			indexRoadOperatorIndex := args[0]
+			indexToken := args[1]
 
 			// Get value arguments
-			argBalance, err := cast.ToUint64E(args[3])
+			argBalance, err := cast.ToUint64E(args[2])
 			if err != nil {
 				return err
 			}
@@ -33,7 +34,7 @@ func CmdCreateUserVault() *cobra.Command {
 
 			msg := types.NewMsgCreateUserVault(
 				clientCtx.GetFromAddress().String(),
-				indexOwner,
+				//indexOwner,
 				indexRoadOperatorIndex,
 				indexToken,
 				argBalance,
@@ -52,21 +53,21 @@ func CmdCreateUserVault() *cobra.Command {
 
 func CmdUpdateUserVault() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-user-vault [owner] [road-operator-index] [token] [balance]",
+		Use:   "update-user-vault [road-operator-index] [token] [balance]",
 		Short: "Update a UserVault",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			// Get indexes
-			indexOwner := args[0]
-			indexRoadOperatorIndex := args[1]
-			indexToken := args[2]
+			//indexOwner := args[0]
+			indexRoadOperatorIndex := args[0]
+			indexToken := args[1]
 
 			// Get value arguments
-			argBalance, err := cast.ToUint64E(args[3])
+			argBalance, err := cast.ToUint64E(args[2])
 			if err != nil {
 				return err
 			}
-
+			fmt.Println(argBalance)
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -74,7 +75,7 @@ func CmdUpdateUserVault() *cobra.Command {
 
 			msg := types.NewMsgUpdateUserVault(
 				clientCtx.GetFromAddress().String(),
-				indexOwner,
+				//indexOwner,
 				indexRoadOperatorIndex,
 				indexToken,
 				argBalance,
@@ -93,13 +94,13 @@ func CmdUpdateUserVault() *cobra.Command {
 
 func CmdDeleteUserVault() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete-user-vault [owner] [road-operator-index] [token]",
+		Use:   "delete-user-vault [road-operator-index] [token]",
 		Short: "Delete a UserVault",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			indexOwner := args[0]
-			indexRoadOperatorIndex := args[1]
-			indexToken := args[2]
+			//indexOwner := args[0]
+			indexRoadOperatorIndex := args[0]
+			indexToken := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -108,7 +109,7 @@ func CmdDeleteUserVault() *cobra.Command {
 
 			msg := types.NewMsgDeleteUserVault(
 				clientCtx.GetFromAddress().String(),
-				indexOwner,
+				//indexOwner,
 				indexRoadOperatorIndex,
 				indexToken,
 			)

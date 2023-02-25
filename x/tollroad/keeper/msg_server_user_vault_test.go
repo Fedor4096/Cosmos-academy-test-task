@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 
 	keepertest "github.com/b9lab/toll-road/testutil/keeper"
@@ -28,6 +27,7 @@ func TestUserVaultMsgServerCreate(t *testing.T) {
 			Token:             strconv.Itoa(i),
 		}
 		_, err := srv.CreateUserVault(wctx, expected)
+		t.Log(err)
 		require.NoError(t, err)
 		rst, found := k.GetUserVault(ctx,
 			expected.Owner,

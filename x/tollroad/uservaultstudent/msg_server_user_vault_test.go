@@ -55,6 +55,7 @@ func TestUserVaultMsgServerCreateFive(t *testing.T) {
 		escrow.ExpectFundVault(wctx, creator, sdk.DefaultBondDenom, createRequest.Balance)
 		_, err := srv.CreateUserVault(wctx, createRequest)
 		require.NoError(t, err)
+
 		rst, found := k.GetUserVault(ctx,
 			createRequest.Creator,
 			createRequest.RoadOperatorIndex,
@@ -67,6 +68,17 @@ func TestUserVaultMsgServerCreateFive(t *testing.T) {
 			Token:             createRequest.Token,
 			Balance:           createRequest.Balance,
 		}, rst)
+		//t.Log(creator)
+		//t.Log(createRequest.RoadOperatorIndex)
+		//t.Log(createRequest.Token)
+		//t.Log(createRequest.Balance)
+		//
+		//t.Log("//////////////////")
+		//t.Log(rst.Owner)
+		//t.Log(rst.RoadOperatorIndex)
+		//t.Log(rst.Token)
+		//t.Log(rst.Balance)
+
 	}
 }
 
