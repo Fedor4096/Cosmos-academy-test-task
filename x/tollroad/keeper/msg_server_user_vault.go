@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"context"
-
+	"fmt"
 	types "github.com/b9lab/toll-road/x/tollroad/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -66,7 +66,8 @@ func (k msgServer) UpdateUserVault(goCtx context.Context, msg *types.MsgUpdateUs
 	if msg.Creator != valFound.Owner {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
-
+	fmt.Println(msg.Balance)
+	fmt.Println(valFound.Balance)
 	balance := msg.Balance
 	userToModuleFlag := true
 	if msg.Balance > valFound.Balance {
@@ -75,8 +76,10 @@ func (k msgServer) UpdateUserVault(goCtx context.Context, msg *types.MsgUpdateUs
 	} else if msg.Balance < valFound.Balance {
 		balance = valFound.Balance - msg.Balance
 		userToModuleFlag = false
+	} else {
+		balance = 0
 	}
-
+	fmt.Println(balance)
 	var userVault = types.UserVault{
 		//Creator:           msg.Creator,
 		Owner:             msg.Creator,
@@ -97,7 +100,7 @@ func (k msgServer) UpdateUserVault(goCtx context.Context, msg *types.MsgUpdateUs
 			return nil, err
 		}
 	}
-	userVault = types.UserVault{
+	userVault1 := types.UserVault{
 		//Creator:           msg.Creator,
 		Owner:             msg.Creator,
 		RoadOperatorIndex: msg.RoadOperatorIndex,
@@ -106,7 +109,7 @@ func (k msgServer) UpdateUserVault(goCtx context.Context, msg *types.MsgUpdateUs
 		//Balance: balance,
 	}
 
-	k.SetUserVault(ctx, userVault)
+	k.SetUserVault(ctx, userVault1)
 
 	return &types.MsgUpdateUserVaultResponse{}, nil
 }
